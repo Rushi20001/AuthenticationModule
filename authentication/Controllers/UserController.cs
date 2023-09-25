@@ -15,6 +15,78 @@ namespace authentication.Controllers
             return View();
         }
 
+        public ActionResult login(LoginModel loginModel)
+        {
+            loginModel model = new loginModel();
+            bool result = model.authLogin(loginModel);
+            if (result)
+            {
+
+                if (model.IsAdmin(loginModel.userEmail))
+                {
+                    return RedirectToAction("Index","Home");
+                }
+                else { 
+                    return RedirectToAction ("About","Home"); 
+                }
+               // return RedirectToAction("About", "Home");
+               // return View(loginModel);
+                //return Json(1);
+            }
+           // return View();
+            else { return Json(2); }
+
+        }
+        //public ActionResult login(LoginModel loginModel)
+        //{
+        //    loginModel model = new loginModel();
+        //    if (model.authLogin(loginModel))
+        //    {
+        //        return RedirectToAction("About", "Home"); }
+
+
+        //    else if (model.IsAdmin(loginModel.userEmail))
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+
+        //    // return RedirectToAction("About", "Home");
+        //    // return View(loginModel);
+        //    //return Json(1);
+        //    return Json(2);
+
+        //}
+        // return View();
+
+
+
+        [HttpPost]
+        public ActionResult MatchOtp(string no)
+        {
+            LoginModel loginModel = new LoginModel();
+
+            UserModel user = new UserModel();
+            if(user.GetOtp(no)!=null )
+            {
+                bool otp = user.verifyOTP("465704",no);
+                if(otp)
+                {
+                    return Json(new{message="login" });
+                }
+                else
+                {
+                    return Json(00);
+                }
+                //return Json(1);
+            }
+            else
+            {
+                return Json(0);
+            }
+
+        }
+
+
         //  public string connectionString = "data source=(LocalDb)\\MSSQLLocalDB;initial catalog=auth;persist security info=True;";
         [HttpPost]
         public ActionResult generateotp(string mobilenumber)
@@ -47,7 +119,7 @@ namespace authentication.Controllers
                     }
                 }
                 else {
-                    return Json(new { success = "false", message = "user not found" });
+                    return Json(new { success = "false", message = "mobile not found" });
                         }
 
             }
@@ -56,5 +128,6 @@ namespace authentication.Controllers
             }
 
         }
+        
     }
 }
