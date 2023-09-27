@@ -1,0 +1,101 @@
+---------table creation-------------------------------------------------------------------------------------
+create table tbl_ProductCategory(productCategoryId int identity(1,1),productCategoryName varchar(30),createdOn dateTime default getdate(),updatedOn dateTime default getdate())
+
+create table tbl_ProductSubCategory(productSubCategoryId int identity(1,1),productCategoryId int,productSubCategoryName varchar(50),createdOn dateTime default getdate(),updatedOn dateTime default getdate())
+
+create table tbl_ProductDetails(productDetailsId int identity(1,1),productSubCategoryId int,productTitle varchar(70)NOT NULL,productDescription varchar(255)NOT NULL,
+productPrice float NOT NULL,productImageId int ,cityId int,productStatus bit default 0,userId int,createdOn dateTime default getdate(),updatedOn dateTime default getdate())
+
+CREATE TABLE tbl_ProductImages (productImageId int identity(1,1), productDetailsId int, imageData varbinary(max) NOT NULL,createdOn dateTime default getdate(),updatedOn dateTime default getdate());
+
+create table tbl_State(stateId int identity(1,1),stateName varchar(30))
+
+create table tbl_City(city_Id int identity(1,1),stateId int,cityName varchar(30))
+-------insert data------------------
+select * from tbl_ProductCategory
+select * from tbl_ProductSubCategory
+select * from tbl_ProductDetails
+select * from tbl_ProductImages
+select * from tbl_City
+
+-------drop table---------------------
+----drop table tbl_ProductCategory
+--drop table tbl_ProductSubCategory
+--drop table tbl_ProductDetails
+--drop table tbl_ProductImages
+--drop table tbl_State;
+--drop table tbl_City;
+--------delete-------------------------
+--delete from tbl_City where city_Id=4
+--delete from tbl_ProductDetails where productDetailsId=1
+--------------------------------------------
+insert into tbl_State values('gujarat');
+insert into tbl_City values(3,'jamnagar')
+
+---------preocedure-------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE ps_AddNewProductCategory 
+(
+    @productCategoryName varchar(30)
+)
+AS
+BEGIN
+    INSERT INTO tbl_ProductCategory  VALUES (@productCategoryName,getdate(),getdate())
+END
+
+-----------------------------------------------------------------------------------
+Exec ps_AddNewProductCategory 'fashion';
+------------------------------------------------------------------------------------
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Alter PROCEDURE AddNewProductSubCategory 
+(
+   @productCategoryId int,
+   @ProductSubCategoryName varchar(50)
+)
+AS
+BEGIN
+    INSERT INTO tbl_ProductSubCategory VALUES (@productCategoryId,@ProductSubCategoryName,getdate(),getdate())
+END
+-----------------------------------------------------------------------------
+exec AddNewProductSubCategory 2,'kid';
+
+----------------------------------------------------------------------------
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+Alter PROCEDURE AddNewProductDetails 
+(
+
+	
+   @productSubCategoryId int,
+   @productTitle varchar(70),
+   @productDescription varchar(255),
+   @productPrice float,
+   @productImageId int,
+   @cityId int,
+   @userId int
+ )
+AS
+BEGIN
+    INSERT INTO tbl_ProductDetails (productSubCategoryId,productTitle,productDescription,productPrice,productImageId,cityId,userId,createdOn,updatedOn) VALUES (@productSubCategoryId,@productTitle,@productDescription,@productPrice,@productImageId,@cityId,@userId,getdate(),getdate())
+END
+-----------------------------------------------------------------------
+exec AddNewProductDetails 1,'Xiaomi 11T Pro 5G','120Hz True 10-bit AMOLED Display 120Hz True 10-bit AMOLED Display120W Xiaomi HyperCharge',12000,1,1,1
+--------------------------------------------------------------------
+CREATE PROCEDURE GetProductDetails
+AS
+BEGIN
+    SELECT (productDetailsId, productSubCategoryId,productTitle,productDescription, productPrice,productImageId,cityId,productStatus,userId,createdOn,updatedOn
+    FROM
+        tbl_ProductDetails;
+END;
+-------------------------------------------------------------------------
