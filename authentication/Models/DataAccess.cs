@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Web;
+using Vonage.Users;
 
 namespace authentication.Models
 {
@@ -66,49 +67,75 @@ namespace authentication.Models
         //public UserModel()
         //{
         //   connectionString = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
-           
+
         //}
 
-      public string GetOtp(string number)
+        //public int GetOtp( int userid,out int storeotp)
+        //  {
+        //      SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
+        //      string query = "select lu.LoginOtp from Users u join LoginUser lu on u.userId=lu.userIdByLoginUser where lu.LoginUserId=@id";
+
+        //      SqlCommand cmd=new SqlCommand(query,connection);
+        //      cmd.Parameters.AddWithValue("@id",userid);
+        //      connection.Open();
+        //      int count = (int)cmd.ExecuteScalar() ;
+        //      connection.Close();
+        //      if (count>0)
+        //      {
+        //          storeotp = count;
+        //          return storeotp;
+        //      }
+
+
+
+        //  }
+        public int GetOtp( int userId )
         {
             SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
-            string query = "select lu.LoginOtp from Users u join LoginUser lu on u.userId=lu.userIdByLoginUser where u.MobileNo=@number";
+            string query = "SELECT lu.LoginOtp FROM Users u JOIN LoginUser lu ON u.userId = lu.userIdByLoginUser WHERE lu.LoginUserId = @id and lu.ExpirationLoginTime>GETDATE()";
 
-            SqlCommand cmd=new SqlCommand(query,connection);
-            cmd.Parameters.AddWithValue("@number",number);
+            SqlCommand cmd = new SqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@id", userId);
             connection.Open();
-            string count = cmd.ExecuteScalar() as string;
+            int count = (int)(cmd.ExecuteScalar() ?? 0); // Use null coalescing to handle null results
             connection.Close();
-            return count;
-            //int otp;
-            //if (int.TryParse(cmd.ExecuteScalar()?.ToString(), out otp))
-            //{
-            //    connection.Close();
-            //    return otp;
-            //}
-            //else
-            //{
-            //    // Handle the case where the conversion fails (e.g., the result is not an integer)
-            //    connection.Close();
-            //    // You might want to return a default value or handle the error differently here
-            //    throw new Exception("Unable to retrieve OTP.");
-            //}
-         
-            
-        }
 
-        public bool verifyOTP(string uotp,string number )
-        {
-            // string uotp = "465704";
-        
-            string count=GetOtp(number);
-            if (count == uotp)
-            {
-                return true;
-            }
-            else
-                return false;
+             // Set the out parameter here
+
+            return count; // Return the OTP value, even if it's 0 or less
         }
+        public int getidfromOtp(int userotp)
+        {
+           
+            
+                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
+                string query = "SELECT LoginUserId FROM LoginUser where LoginOtp=@otp";
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@otp", userotp);
+                connection.Open();
+                object c = cmd.ExecuteScalar();
+                connection.Close();
+                if (c != null)
+                {
+                    return (int)c;
+                }
+                else { return 0; }
+            
+            }
+
+        //public bool verifyOTP(string uotp,int userid )
+        //{
+        //    // string uotp = "465704";
+                             
+        //    string count=GetOtp(userid);
+        //    if (count == uotp)
+        //    {
+        //        return true;
+        //    }
+        //    else
+        //        return false;
+        //}
 
         public bool MobileNumberExists(string MobileNo)
         {
@@ -126,7 +153,7 @@ namespace authentication.Models
                 }
             }
         }
-        public bool InsertOtp(int userid,string otp,DateTime expiretime)
+        public bool InsertOtp(int userid,int otp,DateTime expiretime)
         {
             using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString()))
             {
@@ -182,9 +209,22 @@ namespace authentication.Models
                 }
             }
 
-        internal static object GenerateRandomOtp(int v)
+        //internal static object GenerateRandomOtp(int v)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        public bool checktime(LoginUser user)
         {
-            throw new NotImplementedException();
+            SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
+            string q = "select ExpirationLoginTime,userIdByLoginUser from LoginUser where ExpirationLoginTime>GETDATE() and" +
+                " userIdByLoginUser=@userIdByLoginUser";
+             SqlCommand cmd=new SqlCommand(q, conn);
+            cmd.Parameters.AddWithValue ("@userIdByLoginUser", user.LoginUserId);
+            conn.Open();
+            int row=(int)cmd.ExecuteScalar();
+            conn.Close();
+            return true;
         }
     }
 

@@ -29,6 +29,7 @@ namespace authentication.Controllers
             bool result = model.authLogin(loginModel);
             if (result)
             {
+                
 
                 if (model.IsAdmin(loginModel.userEmail))
                 {
@@ -69,85 +70,96 @@ namespace authentication.Controllers
 
 
         [HttpPost]
-        public ActionResult MatchOtp(string no)
+        public ActionResult MatchOtp(int userotp)
         {
-            LoginModel loginModel = new LoginModel();
-            
+
+            //LoginModel loginModel = new LoginModel();
+
             DataAccess user = new DataAccess();
-            Session["key"] = user.GetOtp(no);
-            if (user.GetOtp(no)!=null )
-            {
-                bool otp = user.verifyOTP("26268", no);
-                if(otp)
+
+            int userid = user.getidfromOtp(userotp);
+
+            if (userid > 0)
+            {   //string stored = user.GetOtp(userid);
+
+                int stored = user.GetOtp(userid);
+                //bool otp = user.verifyOTP(userotp,out stored);
+                if (userotp == stored)
                 {
-                    return Json(new{message="login" });
+
+                    return Json(new { message = "login" });
                 }
                 else
                 {
                     return Json(00);
                 }
-                //return Json(1);
-            }
-            else
-            {
-                return Json(0);
-            }
+                //return Json(1);}
+                
 
+
+
+            }else
+            {
+                ViewBag.msg = "Invalid OTP";
+                return Json(2);
+            }
         }
 
-        public ActionResult generateotp()
+            public ActionResult generateotp()
         {
             return View();
         }
         //  public string connectionString = "data source=(LocalDb)\\MSSQLLocalDB;initial catalog=auth;persist security info=True;";
         [HttpPost]
-        public ActionResult generateotp(string MobileNo)
-        {
+        //public ActionResult generateotp(string MobileNo)
+        //{
             
-            try
-            {
-                DataAccess model = new DataAccess();
-                bool existMobile = model.MobileNumberExists(MobileNo);
-                if (existMobile) {
-                    string otp = model.GenerateRandomOTP(6);
-                    DateTime expiretime= DateTime.Now.AddMinutes(5);
-                    int userid=model.GetUserIdByMobileNumber(MobileNo);
+        //    try
+        //    {
+        //        DataAccess model = new DataAccess();
+        //        bool existMobile = model.MobileNumberExists(MobileNo);
+        //        if (existMobile) {
+        //            string otp = model.GenerateRandomOTP(6);
+        //            DateTime expiretime= DateTime.Now.AddMinutes(5);
+        //            int userid=model.GetUserIdByMobileNumber(MobileNo);
 
-                    if(userid > 0)
-                    {
-                        bool otpinserted= model.InsertOtp(userid, otp, expiretime);
-                        if (otpinserted)
-                        {
-                            return Json(new {success="true",message="otp generated and stored." });
-                        }
-                        else
-                        {
-                            return Json(new { success = "false", message = "failed" });
-                        }
-                    }
-                    else
-                    {
-                        return Json(new { success = "false", message = "user with mobile not found." });
-                    }
-                }
-                else {
-                    return Json(new { success = "false", message = "mobile not found" });
-                        }
+        //            if(userid > 0)
+        //            {
+        //                bool otpinserted= model.InsertOtp(userid, otp, expiretime);
+        //                if (otpinserted)
+        //                {
+        //                    return Json(new {success="true",message="otp generated and stored." });
+        //                }
+        //                else
+        //                {
+        //                    return Json(new { success = "false", message = "failed" });
+        //                }
+        //            }
+        //            else
+        //            {
+        //                return Json(new { success = "false", message = "user with mobile not found." });
+        //            }
+        //        }
+        //        else {
+        //            return Json(new { success = "false", message = "mobile not found" });
+        //                }
 
-            }
-            catch (Exception ex){ 
-              return Json(new { success = "false",message="error:"+ex.Message}); 
-            }
-
-        }
-   
-
-// Replace these values with your Vonage credentials
-string apiKey = "e3cb936f";
-    string apiSecret = "CYknodsz77JxHXx8";
-    string vonagePhoneNumber = "918237382320";
+        //    }
+        //    catch (Exception ex){ 
+        //      return Json(new { success = "false",message="error:"+ex.Message}); 
+        //    }
 
         
+        
+        //}
+
+
+   //     Replace these values with your Vonage credentials
+   //string apiKey = "e3cb936f";
+   //     string apiSecret = "CYknodsz77JxHXx8";
+   //     string vonagePhoneNumber = "918237382320";
+
+
         public ActionResult SendOtpViaSms()
     {
             DataAccess userModel = new DataAccess();  
@@ -170,38 +182,12 @@ string apiKey = "e3cb936f";
                 From = "Vonage APIs",
                 Text = $"A text message sent using the Vonage SMS API:{otp}"
             });
-            //    var response = client.SmsClient.SendAnSms(new Vonage.Messaging.SendSmsRequest
-            //{
-            //    To = userPhoneNumber,
-            //    From = vonagePhoneNumber,
-            //    Text = $"Your OTP is: {otp}"
-            //});
-
-            // Store the OTP on the server temporarily, associated with the user's session or request context
             Session["UserOTP"] = otp;
 
         return View();
     }
 
-        //public ActionResult verifyotp(string userotp)
-        //   {
-        //       int? storedotp = Session["otp"] as int?;
-        //       if (storedotp == 0)
-        //       {
-        //           return Json(new {success=false,Message="otp not found"});
-        //       }
-        //       if (storedotp.Value.ToString() == userotp)
-        //       {
-        //           return RedirectToAction("Index");
-        //           Session["otp"] = null;
-        //           return Json(new { success = true, Message = "otp verified" });
-        //       }
-        //       return Json (new
-        //       {
-        //           success=false,
-        //           Message="otp not verified"
-        //       });
-        //   }
+       
         public ActionResult verify()
         {
             return View();
@@ -209,12 +195,20 @@ string apiKey = "e3cb936f";
         [HttpPost]
         public ActionResult verify(string userotp)
         {
-            if (userotp == Session["otp"].ToString())
-            {
-                return RedirectToAction("About","Home");
-            }
-            else { return Json(0);
-            }
+            DataAccess dataAccess = new DataAccess();
+           
+                if (userotp == Session["otp"].ToString())
+                {
+                    return RedirectToAction("About", "Home");
+                }
+                else
+                {
+                    return Json(0);
+                }
+           
+            
+            
+         
         }
 
         public ActionResult sendotp()
@@ -234,17 +228,23 @@ string apiKey = "e3cb936f";
             int value=rand.Next(100001,999999);
             //string address = "+918237382320";
             string otp = $"Your otp is:{value}";
+
             
+            int userid=dataAccess.GetUserIdByMobileNumber(Mobileno);
+            DateTime expiretime = DateTime.Now.AddMinutes(5);
+            dataAccess.InsertOtp(userid,value,expiretime);
+
             using (var wb=new WebClient())
             { 
                 byte[] response = wb.UploadValues("https://api.textlocal.in/send/", new NameValueCollection()
                 {
                     {"apikey","NTA2ODRhNGU0ZDUyNmY0MzQ2NmQ1YTczNjQ1YTM2N2E=" },
-                    {"numbers",Mobileno },
+                    {"numbers","91"+Mobileno },
                     {"sender","TXTLCL" }
                 });
                 string result=System.Text.Encoding.UTF8.GetString(response);
                 Session["otp"] = value;
+                
             }
             return RedirectToAction("verify","User");
             return Json(new { success = true, message = "OTP sent successfully." });
