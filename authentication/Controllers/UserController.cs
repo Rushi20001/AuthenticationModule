@@ -26,7 +26,7 @@ namespace authentication.Controllers
         public ActionResult login(LoginModel loginModel)
         {
             loginModel model = new loginModel();
-            bool result = model.authLogin(loginModel);
+            bool result = model.authLogin(loginModel, out string msg);
             if (result)
             {
                 
@@ -36,6 +36,7 @@ namespace authentication.Controllers
                     return RedirectToAction("Index","Home");
                 }
                 else { 
+
                     return RedirectToAction ("About","Home"); 
                 }
                // return RedirectToAction("About", "Home");
@@ -43,7 +44,9 @@ namespace authentication.Controllers
                 //return Json(1);
             }
            // return View();
-            else { return Json(2); }
+            else {
+                ViewBag.m = msg;
+                return Json(2); }
 
         }
         //public ActionResult login(LoginModel loginModel)

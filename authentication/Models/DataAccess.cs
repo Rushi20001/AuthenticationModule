@@ -14,15 +14,35 @@ namespace authentication.Models
 
     public class loginModel
     {
-        public bool authLogin(LoginModel model)
+        public bool authLogin(LoginModel model,out string validationmsg)
         {
             SqlConnection conn = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
-            string q = "select count(*) from Users where userEmail=@userEmail and userPassword=@userPassword";
-            SqlCommand cmd = new SqlCommand(q,conn);
+            string q = "select count(*) from Users where userEmail=@userEmail";
+            SqlCommand cmd = new SqlCommand(q, conn);
+            cmd.Parameters.AddWithValue("@userEmail", model.userEmail);
+
+            conn.Open();
+            int count = (int)cmd.ExecuteScalar();
+            conn.Close();
+            if (count==0)
+            {
+                validationmsg = "UserEmail doesn't Exist";
+                return false;
+            }
+            else
+            {
+                validationmsg = string.Empty;
+                return count>0;    
+            }
+
+
+            
+            string query = "select count(*) from Users where userEmail=@userEmail and userPassword=@userPassword";
+            SqlCommand command = new SqlCommand(query,conn);
             cmd.Parameters.AddWithValue("@userEmail", model.userEmail);
             cmd.Parameters.AddWithValue("@userPassword", model.userPassword);
             conn.Open();
-             int count=(int)cmd.ExecuteScalar();
+             int rows=(int)cmd.ExecuteScalar();
             conn.Close();
             if (count > 0)
             {
@@ -35,6 +55,7 @@ namespace authentication.Models
 
             }
             //return false;
+            validationmsg = "Invalid Credentials ";
             return count > 0;
             //SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             //DataTable dataTable = new DataTable();
