@@ -1,0 +1,51 @@
+﻿@model IEnumerable<UserScreen.Models.ModelMyAdvertise>
+
+<p>
+    
+</p>
+<table class="table">
+    <tr>
+
+        <th>
+            @Html.DisplayNameFor(model => model.advertiseTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.advertiseDescription)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.advertisePrice)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.stateName)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.cityName)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.advertiseTitle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.advertiseDescription)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.advertisePrice)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.stateName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.cityName)
+        </td>
+
+
+    </tr>
+}
+
+</table>
