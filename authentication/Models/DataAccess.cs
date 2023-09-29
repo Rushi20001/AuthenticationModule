@@ -29,34 +29,35 @@ namespace authentication.Models
                 validationmsg = "UserEmail doesn't Exist";
                 return false;
             }
-            else
-            {
-                validationmsg = string.Empty;
-                return count>0;    
-            }
+           
 
 
             
             string query = "select count(*) from Users where userEmail=@userEmail and userPassword=@userPassword";
-            SqlCommand command = new SqlCommand(query,conn);
+             cmd = new SqlCommand(query,conn);
             cmd.Parameters.AddWithValue("@userEmail", model.userEmail);
             cmd.Parameters.AddWithValue("@userPassword", model.userPassword);
             conn.Open();
-             int rows=(int)cmd.ExecuteScalar();
+             count=(int)cmd.ExecuteScalar();
             conn.Close();
-            if (count > 0)
+            validationmsg=count==0?"invalid credintials":string.Empty;
+            if (count>0)
             {
                 bool isadmin = IsAdmin(model.userEmail);
                 if (isadmin)
                 {
                     return true;
                 }
-
-
             }
-            //return false;
-            validationmsg = "Invalid Credentials ";
-            return count > 0;
+            return count>0;
+            //if (rows == 0)
+            //{  
+               
+
+            //}
+            ////return false;
+            //validationmsg = "Invalid Credentials ";
+            //return rows>0 ;
             //SqlDataAdapter adapter = new SqlDataAdapter(cmd);
             //DataTable dataTable = new DataTable();
 
