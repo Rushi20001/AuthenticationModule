@@ -89,7 +89,7 @@ namespace authentication.Models
 
 
         //  }
-        public int GetOtp( int userId )
+        public int GetOtp( int userId,out string message )
         {
             SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
             string query = "SELECT lu.LoginOtp FROM Users u JOIN LoginUser lu ON u.userId = lu.userIdByLoginUser WHERE lu.LoginUserId = @id and lu.ExpirationLoginTime>GETDATE()";
@@ -99,12 +99,21 @@ namespace authentication.Models
             connection.Open();
             int count = (int)(cmd.ExecuteScalar() ?? 0); // Use null coalescing to handle null results
             connection.Close();
+            if (count == 0)
+            {
+                message = "Time Expired";
+                return 0;
+            }
+            else
+            {
+                message=string.Empty;
 
+                return count;
+            }
              // Set the out parameter here
-
-            return count; // Return the OTP value, even if it's 0 or less
+ 
         }
-        public int getidfromOtp(int userotp)
+        public int getidfromOtp(int userotp,out string msg)
         {
            
             
@@ -116,12 +125,16 @@ namespace authentication.Models
                 connection.Open();
                 object c = cmd.ExecuteScalar();
                 connection.Close();
-                if (c != null)
-                {
-                    return (int)c;
+                if (c == null)
+                 {
+                msg = "Otp not matched";
+                    return 0;
+                
                 }
-                else { return 0; }
-            
+
+            msg = null;
+            //else { msg = "user found"; return (int)c; }
+            return (int)c;
             }
 
         //public bool verifyOTP(string uotp,int userid )

@@ -77,12 +77,12 @@ namespace authentication.Controllers
 
             DataAccess user = new DataAccess();
 
-            int userid = user.getidfromOtp(userotp);
+            int userid = user.getidfromOtp(userotp,out string msg);
 
             if (userid > 0)
             {   //string stored = user.GetOtp(userid);
 
-                int stored = user.GetOtp(userid);
+                int stored = user.GetOtp(userid,out string message);
                 //bool otp = user.verifyOTP(userotp,out stored);
                 if (userotp == stored)
                 {
@@ -91,6 +91,7 @@ namespace authentication.Controllers
                 }
                 else
                 {
+                    ViewBag.userid = message;
                     return Json(00);
                 }
                 //return Json(1);}
@@ -100,7 +101,7 @@ namespace authentication.Controllers
 
             }else
             {
-                ViewBag.msg = "Invalid OTP";
+                ViewBag.msg = msg;
                 return Json(2);
             }
         }
