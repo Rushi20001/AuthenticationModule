@@ -12,7 +12,7 @@ namespace UserScreen.Models
         public string advertiseTitle { get; set; }
         public string advertiseDescription { get; set; }    
 
-        public int advertisePrice { get; set; } 
+        public decimal advertisePrice { get; set; } 
         public int areaId { get; set; } 
         public bool advertiseStatus { get; set; }
         public int userId { get; set; }

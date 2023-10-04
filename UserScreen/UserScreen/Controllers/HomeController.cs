@@ -9,7 +9,25 @@ namespace UserScreen.Controllers
 {
     public class HomeController : Controller
     {
+        DataAccess  dataAccess=new DataAccess();
+
+
         // GET: Home
+
+        public ActionResult newfilter(int? categoryid,int?subcategoryid,int?stateid,int?cityid,int?areaid,decimal?minprice,decimal?maxprice)
+        {
+            List<ModelMyAdvertise> list = dataAccess.newFilter(categoryid,subcategoryid,stateid,cityid,areaid,minprice,maxprice);
+
+            return View(list);
+        }
+
+
+        public ActionResult All() { 
+        
+            List<categoryViewModel>obj=dataAccess.all();
+            return View(obj);
+        
+        }
         public ActionResult Index(int categoryid)
         {
             DataAccess access = new DataAccess();
@@ -22,6 +40,16 @@ namespace UserScreen.Controllers
            
             
 
+            return View();
+        }
+
+        public ActionResult ShowByArea(int areaid) 
+        {
+            List<ModelMyAdvertise>Area=dataAccess.GetByArea(areaid);
+            if (Area.Count>0)
+            {
+                return View(Area);
+            }
             return View();
         }
         public ActionResult ShowBySubCategory(int subCategoryId)
@@ -71,5 +99,28 @@ namespace UserScreen.Controllers
             }
             return View();
         }
+        public ActionResult ShowAllProducts() 
+        {
+            List<ModelMyAdvertise> all = dataAccess.GetAllProducts();
+            if(all!=null)
+            {
+                return View(all);
+            }
+            return View();
+        }
+
+        public ActionResult Showsubcategorydetails(int procategoryid)
+        {
+            DataAccess dataAccess = new DataAccess();
+            List<ModelProductSubCategory>sublist=dataAccess.GetSubByCategoryId(procategoryid);
+            if (sublist!=null)
+            {
+                return View(sublist);
+            }
+            return View();
+
+        }
+
+
     }
 }

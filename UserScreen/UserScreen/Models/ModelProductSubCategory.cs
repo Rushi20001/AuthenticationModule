@@ -8,7 +8,7 @@ namespace UserScreen.Models
     public class ModelProductSubCategory : ModelProductCategory
     {
         public int productSubCategoryId { get; set; }
-        public int productCategoryId { get; set; }
+        //public int productCategoryId { get; set; }
         public string productSubCategoryName { get; set; }
     }
 }

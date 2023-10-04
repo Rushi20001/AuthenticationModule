@@ -1,0 +1,47 @@
+﻿@model IEnumerable<UserScreen.Models.categoryViewModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>All</title>
+</head>
+<body>
+ 
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.category_id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.category_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.subcategories)
+            </th>
+            <th></th>
+        </tr>
+    
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.category_id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.category_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.subcategories)
+            </td>
+          
+        </tr>
+    }
+    
+    </table>
+</body>
+</html>

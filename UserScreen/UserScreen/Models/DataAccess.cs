@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -11,7 +12,7 @@ namespace UserScreen.Models
 {
     public class DataAccess
     {
-        private SqlConnection _connection;
+        private readonly SqlConnection _connection;
         public DataAccess()
         {
             _connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
@@ -53,18 +54,20 @@ namespace UserScreen.Models
         }
         #endregion
 
+
         #region ByCity
         public List<ModelMyAdvertise> GetProductByCity(int cityid)
         {
             List<ModelMyAdvertise>city=new List<ModelMyAdvertise>();
-            string query = "select ad.advertiseTitle,ad.advertiseDescription,ad.advertisePrice,ar.areaName,ct.cityName,st.stateName" +
-                " from tbl_MyAdvertise ad\r\n" +
-                "join tbl_Area ar on ad.areaId=ar.areaId\r\n" +
-                "join tbl_City ct on ar.cityId=ct.cityId\r\n" +
-                "join tbl_State st on ct.stateId=st.stateId\r\nwhere ct.cityId=@cityid";
-            SqlCommand cmd= new SqlCommand(query, _connection);
+            //string query = "select ad.advertiseTitle,ad.advertiseDescription,ad.advertisePrice,ar.areaName,ct.cityName,st.stateName" +
+            //    " from tbl_MyAdvertise ad\r\n" +
+            //    "join tbl_Area ar on ad.areaId=ar.areaId\r\n" +
+            //    "join tbl_City ct on ar.cityId=ct.cityId\r\n" +
+            //    "join tbl_State st on ct.stateId=st.stateId\r\nwhere ct.cityId=@cityid";
+            SqlCommand cmd= new SqlCommand("GetByCity", _connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+           cmd.Parameters.AddWithValue("@cityid",cityid);
             _connection.Open();
-            cmd.Parameters.AddWithValue("@cityid",cityid);
             SqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
@@ -84,17 +87,20 @@ namespace UserScreen.Models
         }
         #endregion
 
+
         #region Bystate
         public List<ModelMyAdvertise> GetProductByState(int stateid)
         {
             List<ModelMyAdvertise>state=new List<ModelMyAdvertise>();
-            string query = "select ad.advertiseTitle,ad.advertiseDescription,ad.advertisePrice,ar.areaName,ct.cityName,st.stateName" +
-                " from tbl_MyAdvertise ad\r\njoin tbl_Area ar on ad.areaId=ar.areaId\r\n" +
-                "join tbl_City ct on ar.cityId=ct.cityId\r\njoin tbl_State st on ct.stateId=st.stateId\r\nwhere st.stateId=@stateid";
-            SqlCommand cmd=new SqlCommand(query, _connection);
-            _connection.Open();
+            //string query = "select ad.advertiseTitle,ad.advertiseDescription,ad.advertisePrice,ar.areaName,ct.cityName,st.stateName" +
+            //    " from tbl_MyAdvertise ad\r\njoin tbl_Area ar on ad.areaId=ar.areaId\r\n" +
+            //    "join tbl_City ct on ar.cityId=ct.cityId\r\njoin tbl_State st on ct.stateId=st.stateId\r\nwhere st.stateId=@stateid";
+            SqlCommand cmd=new SqlCommand("GetByState", _connection);
+            cmd.CommandType= CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@stateid", stateid);
-            SqlDataReader dr=   cmd.ExecuteReader();
+            _connection.Open();
+           
+            SqlDataReader dr=cmd.ExecuteReader();
             while (dr.Read())
             {
                 ModelMyAdvertise modelMyAdvertise = new ModelMyAdvertise()
@@ -114,6 +120,43 @@ namespace UserScreen.Models
             return state;
         }
         #endregion
+
+        #region ByArea
+        public List<ModelMyAdvertise> GetByArea(int areaid)
+        {
+            List<ModelMyAdvertise>area=new List<ModelMyAdvertise>();
+            //string query = "\tselect ad.advertiseTitle,ad.advertiseDescription,ad.advertisePrice,ar.areaName,ct.cityName,st.stateName\r\nfrom tbl_MyAdvertise ad\r\n" +
+            //    "join tbl_Area ar on ad.areaId=ar.areaId \r\n" +
+            //    "join tbl_City ct on ar.cityId=ct.cityId\r\n" +
+            //    "join tbl_State st on ct.stateId=st.stateId where ar.areaId=@areaid";
+            SqlCommand cmd=new SqlCommand("GetByArea", _connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@areaid", areaid);
+            _connection.Open();
+           
+           
+                 SqlDataReader r= cmd.ExecuteReader();
+            while (r.Read())
+            {
+                ModelMyAdvertise byarea = new ModelMyAdvertise()
+                {
+                    advertiseTitle = r["advertiseTitle"].ToString(),
+                    advertiseDescription = r["advertiseDescription"].ToString(),
+                    advertisePrice = Convert.ToInt32(r["advertisePrice"]),
+                    areaName = r["areaName"].ToString(),
+                    cityName = r["cityName"].ToString(),
+                    stateName = r["stateName"].ToString(),
+
+                };
+                area.Add(byarea);
+            }
+            _connection.Close ();
+            return area;
+        } 
+
+        #endregion
+
+        #region BYSUBcategory
         public List<ModelMyAdvertise>GetProductBySubcategory(int subCategoryId)
         {
             List<ModelMyAdvertise>subcategory = new List<ModelMyAdvertise>();
@@ -137,7 +180,10 @@ namespace UserScreen.Models
             _connection.Close();
             return subcategory;
         }
+        #endregion
 
+
+        #region ByCategory
         public List<ModelMyAdvertise>GetCategoryById(int productCategoryId)
         {
            // SqlConnection sqlConnection = new SqlConnection(ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString());
@@ -166,6 +212,153 @@ namespace UserScreen.Models
             _connection.Close();
             return list;
         }
+        #endregion
 
+        #region AllProducts
+
+        public List<ModelMyAdvertise>GetAllProducts()
+        {
+            List<ModelMyAdvertise>allprod = new List<ModelMyAdvertise>();
+            
+            SqlCommand cmd=new SqlCommand("allproducts", _connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            _connection.Open();
+            SqlDataReader reader=cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                ModelMyAdvertise modelMyAdvertise = new ModelMyAdvertise()
+                {
+                    advertiseTitle = reader["advertiseTitle"].ToString(),
+                    advertiseDescription = reader["advertiseDescription"].ToString(),
+                    advertisePrice = Convert.ToInt32(reader["advertisePrice"]),
+                    areaName = reader["areaName"].ToString(),
+                    cityName = reader["cityName"].ToString(),
+                    stateName = reader["stateName"].ToString(),
+
+                };
+                allprod.Add(modelMyAdvertise);
+
+            }
+            _connection.Close();
+            return allprod;
+
+        }
+        #endregion
+
+        #region FILTER
+        public List<ModelMyAdvertise> GetByFilter(int categoryid,int subcategoryid,int stateid,int cityid,int areaid,
+            decimal minprice,decimal maxprice)
+        { 
+            List<ModelMyAdvertise>modelMyAdvertises = new List<ModelMyAdvertise>();
+            SqlCommand cmd = new SqlCommand("filters", _connection);
+            cmd.CommandType= CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@productCategoryId", categoryid);
+            cmd.Parameters.AddWithValue("@productSubCategoryId", subcategoryid);
+            cmd.Parameters.AddWithValue("@stateId", stateid);
+            cmd.Parameters.AddWithValue("@cityId", cityid);
+            cmd.Parameters.AddWithValue("@areaId", areaid);
+            cmd.Parameters.AddWithValue("@minprice", minprice);
+            cmd.Parameters.AddWithValue("@maxprice", maxprice);
+            _connection.Open();
+            SqlDataReader reader=cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                ModelMyAdvertise model = new ModelMyAdvertise()
+                {
+                    advertiseTitle = reader["advertiseTitle"].ToString(),
+                    advertiseDescription = reader["advertiseDescription"].ToString(),
+                    advertisePrice = Convert.ToDecimal(reader["advertisePrice"]),
+                    areaName = reader["areaName"].ToString(),
+                    cityName = reader["cityName"].ToString(),
+                    stateName = reader["stateName"].ToString()
+
+                };
+                modelMyAdvertises.Add(model);
+            }
+            _connection.Close();
+            return modelMyAdvertises;
+
+        }
+
+        #endregion
+
+        #region subcategorydetail
+        public List<ModelProductSubCategory> GetSubByCategoryId(int procategoryid)
+        {
+            List<ModelProductSubCategory>sub=new List<ModelProductSubCategory>();
+            SqlCommand cmd = new SqlCommand("subcategorydetails", _connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@productcategoryid", procategoryid);
+            _connection.Open();
+            SqlDataReader reader=cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                ModelProductSubCategory model = new ModelProductSubCategory()
+                {
+                    productSubCategoryId = Convert.ToInt32(reader["productSubCategoryId"]),
+                    productSubCategoryName = reader["productSubCategoryName"].ToString() 
+                };
+                sub.Add(model);
+            }
+            _connection.Close();
+            return sub;
+        }
+
+        #endregion
+
+        public List<categoryViewModel> all()
+        {
+            List<categoryViewModel>list= new List<categoryViewModel>();
+            SqlCommand cmd = new SqlCommand("allcategories", _connection);
+            cmd.CommandType= CommandType.StoredProcedure;
+            _connection.Open();
+            SqlDataReader reader=cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                categoryViewModel categoryView = new categoryViewModel()
+                {
+                    category_id = Convert.ToInt32(reader["category_id"]),
+                    category_name = reader["category_name"].ToString(),
+                    subcategories = reader["subcategories"].ToString()
+
+                };
+                list.Add(categoryView);
+            }
+            _connection.Close();
+            return list;
+        }
+        public List<ModelMyAdvertise> newFilter(int? productCategoryId,int? productSubCategoryId,int? stateId,int? cityid,int? areaid,decimal? minprice,decimal? maxprice )
+        {
+            List<ModelMyAdvertise>models= new List<ModelMyAdvertise>();
+            SqlCommand cmd = new SqlCommand("newfilter", _connection);
+            cmd.CommandType= CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@productCategoryId",productCategoryId);
+            cmd.Parameters.AddWithValue("@productsubCategoryId",productSubCategoryId);
+            cmd.Parameters.AddWithValue("@stateid",stateId);
+            cmd.Parameters.AddWithValue("@cityid",cityid);
+            cmd.Parameters.AddWithValue("@areaid",areaid);
+            cmd.Parameters.AddWithValue("@minprice",minprice);
+            cmd.Parameters.AddWithValue("@maxprice",maxprice);
+            _connection.Open();
+            SqlDataReader reader= cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                ModelMyAdvertise model = new ModelMyAdvertise()
+                {
+                    advertiseTitle = reader["advertiseTitle"].ToString(),
+                    advertiseDescription = reader["advertiseDescription"].ToString(),
+                    advertisePrice = Convert.ToDecimal(reader["advertisePrice"]),
+                    cityName = reader["cityName"].ToString(),
+                    stateName = reader["statename"].ToString(),
+
+                };
+                models.Add(model);
+            }
+            _connection.Close();
+            return models;
+            
+            
+
+        } 
     }
 }

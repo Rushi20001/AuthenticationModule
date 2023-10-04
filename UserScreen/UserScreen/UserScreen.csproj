@@ -97,6 +97,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\categoryViewModel.cs" />
     <Compile Include="Models\DataAccess.cs" />
     <Compile Include="Models\ModelAdvertiseImages.cs" />
     <Compile Include="Models\ModelArea.cs" />
@@ -114,6 +115,9 @@
     <Content Include="Views\Home\ShowBySubCategory.cshtml" />
     <Content Include="Views\Home\ShowByState.cshtml" />
     <Content Include="Views\Home\ShowByPrice.cshtml" />
+    <Content Include="Views\Home\ShowAllProducts.cshtml" />
+    <Content Include="Views\Home\All.cshtml" />
+    <Content Include="Views\Home\newfilter.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
