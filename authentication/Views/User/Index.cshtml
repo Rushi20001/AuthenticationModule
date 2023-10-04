@@ -11,6 +11,10 @@
     <title>Index</title>
 </head>
 <body>
+    @if (ViewBag.m != null)
+            {
+                <h2>@ViewBag.m</h2>
+            }
     <div>
         <form id="otpForm" method="POST" action="/user/login">
            <label>Username</label> <input type="text" name="userEmail" /><br />

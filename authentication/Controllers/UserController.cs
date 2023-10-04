@@ -29,24 +29,28 @@ namespace authentication.Controllers
             bool result = model.authLogin(loginModel, out string msg);
             if (result)
             {
-                
+
 
                 if (model.IsAdmin(loginModel.userEmail))
                 {
-                    return RedirectToAction("Index","Home");
+                    return RedirectToAction("Index", "Home");
                 }
-                else { 
+                else
+                {
 
-                    return RedirectToAction ("About","Home"); 
+                    return RedirectToAction("About", "Home");
                 }
-               // return RedirectToAction("About", "Home");
-               // return View(loginModel);
+                // return RedirectToAction("About", "Home");
+                // return View(loginModel);
                 //return Json(1);
             }
-           // return View();
-            else {
+            // return View();
+            else
+            {
                 ViewBag.m = msg;
-                return Json(2); }
+                return View("Index");
+            }
+                //return Json(2); }
 
         }
         //public ActionResult login(LoginModel loginModel)
@@ -69,7 +73,11 @@ namespace authentication.Controllers
 
         //}
         // return View();
-
+        public ActionResult Logout()
+        {
+            Session.Clear();
+            return View("Index");
+        }
 
 
         [HttpPost]
@@ -105,7 +113,8 @@ namespace authentication.Controllers
             }else
             {
                 ViewBag.msg = msg;
-                return Json(2);
+                //return Json(2);
+                return View("verify");
             }
         }
 

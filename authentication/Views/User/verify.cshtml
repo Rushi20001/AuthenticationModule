@@ -10,7 +10,13 @@
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
 </head>
+
 <body>
+    
+    @if (ViewBag.msg!=null)
+            { 
+            <h2>@ViewBag.msg</h2>
+            }
     <div>
         <form id="verify" method="POST" action="/user/matchotp">
             <label>enter otp</label> <input type="text" name="userotp" /><br />
