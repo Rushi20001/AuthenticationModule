@@ -13,6 +13,12 @@ namespace UserScreen.Controllers
 
 
         // GET: Home
+        //public ActionResult Giveallcategories()
+        //{
+        //    List<CategoryWithSubcategoriesViewModel>models=dataAccess.GetCategoriesWithSubcategories();
+        //    return View(models);
+
+        //}
 
         public ActionResult newfilter(int? categoryid,int?subcategoryid,int?stateid,int?cityid,int?areaid,decimal?minprice,decimal?maxprice)
         {

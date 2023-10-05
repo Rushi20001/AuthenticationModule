@@ -359,6 +359,93 @@ namespace UserScreen.Models
             
             
 
-        } 
+        }
+
+        public List<ModelProductSubCategory> GetCategoryWithSubcategories()
+        {
+            List<ModelProductSubCategory> models=new List<ModelProductSubCategory>();
+            
+            string query = "\tselect pc.productCategoryId,pc.productCategoryName,sb.productSubCategoryId,sb.productSubCategoryName from tbl_ProductSubCategory sb\r\n\t\t\t\tjoin\r\n\t\t\t\ttbl_ProductCategory pc on pc.productCategoryId=sb.productCategoryId";
+               
+            SqlCommand cmd= new SqlCommand(query, _connection);
+            _connection.Open();
+            SqlDataReader reader= cmd.ExecuteReader();
+            
+            while (reader.Read())
+            {
+                ModelProductSubCategory subCategory = new ModelProductSubCategory()
+                {
+                    productCategoryId = Convert.ToInt32(reader["productCategoryId"]),
+                    productCategoryName = reader["productCategoryName"].ToString(),
+                    productSubCategoryId = Convert.ToInt32(reader["productSubCategoryId"]), 
+                    productSubCategoryName = reader["productSubCategoryName"].ToString(),
+                };
+                models.Add(subCategory);
+            }
+            _connection.Close(); return models;
+        }
+
+        //public List<CategoryWithSubcategoriesViewModel> GetCategoriesWithSubcategories()
+        //{
+        //    List<CategoryWithSubcategoriesViewModel> categoriesWithSubcategories = new List<CategoryWithSubcategoriesViewModel>();
+
+            
+        //        _connection.Open();
+
+        //        string query = @"
+        //    SELECT
+        //        pc.productCategoryId AS CategoryId,
+        //        pc.productCategoryName AS CategoryName,
+        //        sb.productSubCategoryId AS SubcategoryId,
+        //        sb.productSubCategoryName AS SubcategoryName
+        //    FROM
+        //        tbl_ProductCategory pc
+        //    LEFT JOIN
+        //        tbl_ProductSubCategory sb
+        //    ON
+        //        pc.productCategoryId = sb.productCategoryId
+        //    ORDER BY
+        //        pc.productCategoryId, sb.productSubCategoryId";
+
+        //        using (SqlCommand command = new SqlCommand(query, _connection))
+        //        using (SqlDataReader reader = command.ExecuteReader())
+        //        {
+        //            CategoryWithSubcategoriesViewModel currentCategory = null;
+
+        //            while (reader.Read())
+        //            {
+        //                int categoryId = reader.GetInt32(reader.GetOrdinal("CategoryId"));
+        //                string categoryName = reader.GetString(reader.GetOrdinal("CategoryName"));
+        //                int subcategoryId = reader.GetInt32(reader.GetOrdinal("SubcategoryId"));
+        //                string subcategoryName = reader.GetString(reader.GetOrdinal("SubcategoryName"));
+
+        //                if (currentCategory == null || currentCategory.CategoryId != categoryId)
+        //                {
+        //                    // Start a new category
+        //                    currentCategory = new CategoryWithSubcategoriesViewModel
+        //                    {
+        //                        CategoryId = categoryId,
+        //                        CategoryName = categoryName,
+        //                        Subcategories = new List<SubcategoryViewModel>()
+        //                    };
+
+        //                    categoriesWithSubcategories.Add(currentCategory);
+        //                }
+
+        //                if (subcategoryId != 0) // Ensure there's a valid subcategory
+        //                {
+        //                    currentCategory.Subcategories.Add(new SubcategoryViewModel
+        //                    {
+        //                        SubcategoryId = subcategoryId,
+        //                        SubcategoryName = subcategoryName
+        //                    });
+        //                }
+        //            }
+        //        }
+            
+        //        _connection.Close();
+        //    return categoriesWithSubcategories;
+        //}
+
     }
 }

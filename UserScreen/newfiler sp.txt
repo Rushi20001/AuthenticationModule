@@ -1,0 +1,28 @@
+ALTER proc [dbo].[newfilter]
+@productCategoryId int=null,
+@productSubCategoryId int=null,
+@stateId int=null,
+@cityId int=null,
+@areaId int=null,
+@minprice decimal=null,
+@maxprice decimal=null
+as
+
+begin
+	SELECT ad.advertiseTitle,ad.advertiseDescription,ad.advertisePrice,ar.areaName,ct.cityName,st.stateName  FROM tbl_MyAdvertise ad
+	 join tbl_ProductSubCategory sb on sb.productSubCategoryId=ad.productSubCategoryId
+ join tbl_ProductCategory pc on pc.productCategoryId=sb.productCategoryId
+	join tbl_Area ar on ad.areaId=ar.areaId
+	join tbl_City ct on ar.cityId=ct.cityId 
+	join tbl_State st on ct.stateId=st.stateId
+	WHERE(@productCategoryId is  null or sb.productCategoryId=@productCategoryId) and
+  (@productSubCategoryId is null OR sb.productSubCategoryId = @productSubCategoryId) 
+   AND (@stateId is null or st.stateId=@stateId)
+   and (@cityId is null or ct.cityId=@cityId)
+  AND (@areaId is null OR ar.areaId = @areaId)
+ and
+  (
+(@minprice is null or ad.advertisePrice>=@minprice) and (@maxprice is null or ad.advertisePrice<=@maxprice)
+  )
+
+  end

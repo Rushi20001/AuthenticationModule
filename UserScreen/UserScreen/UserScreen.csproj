@@ -98,6 +98,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\categoryViewModel.cs" />
+    <Compile Include="Models\CategoryWithSubcategoriesViewModel.cs" />
     <Compile Include="Models\DataAccess.cs" />
     <Compile Include="Models\ModelAdvertiseImages.cs" />
     <Compile Include="Models\ModelArea.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Models\ModelProductCategory.cs" />
     <Compile Include="Models\ModelProductSubCategory.cs" />
     <Compile Include="Models\ModelState.cs" />
+    <Compile Include="Models\SubcategoryViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +120,7 @@
     <Content Include="Views\Home\ShowAllProducts.cshtml" />
     <Content Include="Views\Home\All.cshtml" />
     <Content Include="Views\Home\newfilter.cshtml" />
+    <Content Include="Views\Home\Giveallcategories.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -1,0 +1,12 @@
+﻿@model List<UserScreen.Models.CategoryWithSubcategoriesViewModel>
+
+@foreach (var category in Model)
+{
+    <h2>@category.CategoryName</h2>
+    <ul>
+        @foreach (var subcategory in category.Subcategories)
+        {
+            <li>@subcategory.SubcategoryName</li>
+        }
+    </ul>
+}
